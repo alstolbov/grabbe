@@ -1,0 +1,5 @@
+rightcol 68 b-feature__wrap 1 1% 4465
+js-dh 43 more 1 2% 1087
+item news b-tabloid__topic_news 41 b-longgrid-column 4 9% 3185
+rubric 21 g-date 1 4% 168
+item 12 items 1 8% 7207
