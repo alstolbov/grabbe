@@ -3,6 +3,9 @@ var cheerio = require('cheerio');
 
 var _console = logger('log.txt');
 
+var $;
+var bodyArray;
+
 var buildNodeList = function (bodyArray) {
   var tagList = {};
   getNodes(bodyArray, tagList);
@@ -57,24 +60,19 @@ var getItem = function (opt) {
   return res;
 }
 
-var getAllParents = function ($, _class, parentsArr) {
-  var node = $('.' + _class.split(' ').join('.')).toArray()[0];
-  if (node.parent && node.parent.attribs && node.parent.attribs.class) {
-    parentsArr.push(node.parent.attribs.class);
-    parentsArr = getAllParents($, node.parent.attribs.class, parentsArr);
-  }
-  return parentsArr;
-};
-
 var getClass = function (classString) {
   return '.' + classString.replace(/ +(?= )/g,'').trim().split(' ').join('.')
 }
 
+var addHostToLink = function (srcText, host) {
+  var reg = new RegExp('href="/', 'ig');
+  return srcText.replace(reg, 'href="' + host + '/');
+}
+
 var parse = function (_opt, _next) {
-  var _this = this;
-  _this.$ = cheerio.load(_opt.text, {decodeEntities: false});
+  $ = cheerio.load(_opt.text, {decodeEntities: false});
   // console.log($('body').html());
-  var bodyArray = _this.$('body').toArray()[0];
+  bodyArray = $('body').toArray()[0];
   // getNodes(bodyArray);
   var tagList = buildNodeList(bodyArray);
 
@@ -126,7 +124,7 @@ var parse = function (_opt, _next) {
           tmpText +
           '</div>';
         if (_opt.parent && getClass(_opt.parent) == getClass(tag.class) || !_opt.parent) {
-          _this.$(getClass(tag.class)).each(function (i, el) {
+          $(getClass(tag.class)).each(function (i, el) {
             var isNeed = true;
             if (
               (_opt.limit && limited >= _opt.limit) ||
@@ -135,7 +133,7 @@ var parse = function (_opt, _next) {
               isNeed = false;
             }
             if (isNeed) {
-              HTML += _this.$(this).html();
+              HTML += $(this).html();
               HTML += '<hr style="margin: 20px 0;">';
               limited++;
             }
@@ -145,7 +143,9 @@ var parse = function (_opt, _next) {
       }
     });
   }
-  _next(null, HTML);
+  // var childs = getAllChildrens($(getClass('item')).toArray()[0]);
+  // _console.log(childs);
+  _next(null, addHostToLink(HTML, _opt.host));
 };
 
 

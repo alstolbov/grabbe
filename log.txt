@@ -1,0 +1,14 @@
+g-picture 61 topic-title-pic__link js-dh 1 1% undefined
+rightcol 61 b-feature__wrap 1 1% undefined
+item news b-tabloid__topic_news 45 b-longgrid-column 4 8% undefined
+js-dh 40 more 1 2% undefined
+rubric 18 g-date 1 5% undefined
+js-dh picture 17 b-feature b-feature_article 1 5% undefined
+item 12 items 1 8% undefined
+g-picture 61 topic-title-pic__link js-dh 1 1% undefined
+rightcol 61 b-feature__wrap 1 1% undefined
+item news b-tabloid__topic_news 45 b-longgrid-column 4 8% undefined
+js-dh 40 more 1 2% undefined
+rubric 18 g-date 1 5% undefined
+js-dh picture 17 b-feature b-feature_article 1 5% undefined
+item 12 items 1 8% undefined
