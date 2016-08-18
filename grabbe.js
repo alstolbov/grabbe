@@ -1,7 +1,7 @@
 var logger = require('./logger.js');
 var cheerio = require('cheerio');
 
-var _console = logger('log.txt');
+// var _console = logger('log.txt');
 
 var $;
 var bodyArray;
@@ -66,7 +66,80 @@ var getClass = function (classString) {
 
 var addHostToLink = function (srcText, host) {
   var reg = new RegExp('href="/', 'ig');
-  return srcText.replace(reg, 'href="' + host + '/');
+  return srcText.replace(reg, 'href="' + host);
+}
+
+var getDataAsHTML = function (tag, _opt) {
+  var limited = 0;
+  var HTML = '';
+  var tmpText = 'From: ' + tag.class +
+    '<br>count:' + tag.count +
+    '<br>parent:' + tag.parent +
+    '<br>parentCount:' + tag.parentCount +
+    '<br>diff:' + tag.diff + '%'
+  ;
+  HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
+    tmpText +
+    '</div>';
+  
+  $(getClass(tag.class)).each(function (i, el) {
+    var isNeed = true;
+    if (
+      (_opt.limit && limited >= _opt.limit) ||
+      (_opt.skip && i <= _opt.skip)
+    ) {
+      isNeed = false;
+    }
+    if (isNeed) {
+      HTML += $(this).html();
+      HTML += '<hr style="margin: 20px 0;">';
+      limited++;
+    }
+  });
+
+  HTML += '</div>';
+
+  return HTML;
+}
+
+var getDataAsJSON = function (tag, _opt) {
+  var limited = 0;
+  var HTML = {
+    parent: tag.class,
+    items: []
+  };
+
+  // var tmpText = 'From: ' + tag.class +
+  //   '<br>count:' + tag.count +
+  //   '<br>parent:' + tag.parent +
+  //   '<br>parentCount:' + tag.parentCount +
+  //   '<br>diff:' + tag.diff + '%'
+  // ;
+  // HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
+  //   tmpText +
+  //   '</div>';
+  
+  $(getClass(tag.class)).each(function (i, el) {
+    var isNeed = true;
+    if (
+      (_opt.limit && limited >= _opt.limit) ||
+      (_opt.skip && i <= _opt.skip)
+    ) {
+      isNeed = false;
+    }
+    if (isNeed) {
+      HTML.items.push(
+        JSON.parse(
+          JSON.stringify(
+            addHostToLink($(this).html(), _opt.host)
+          )
+        )
+      );
+      limited++;
+    }
+  });
+
+  return HTML;
 }
 
 var parse = function (_opt, _next) {
@@ -103,49 +176,32 @@ var parse = function (_opt, _next) {
     maxDiff += tag.diff;
   });
 
-  var HTML = '';
+  var HTML;
+  if (_opt.view == 'html') HTML = '';
+  if (_opt.view == 'json') HTML = [];
   if (!suspectNodes.length) {
     HTML += 'nothing';
     // HTML += _this.$('body').html();
   } else {
     suspectNodes.map(function (tag) {
-      var limited = 0;
       if (tag.diff < maxDiff/suspectNodes.length) {
-        _console.log(tag.class, tag.count, tag.parent, tag.parentCount, tag.diff + '%', tag.content);
-        var tmpText = 'From: ' + tag.class +
-          '<br>count:' + tag.count +
-          '<br>parent:' + tag.parent +
-          '<br>parentCount:' + tag.parentCount +
-          '<br>diff:' + tag.diff + '%'
-        ;
-        // logger(tag.allParents);
-        // logger();
-        HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
-          tmpText +
-          '</div>';
         if (_opt.parent && getClass(_opt.parent) == getClass(tag.class) || !_opt.parent) {
-          $(getClass(tag.class)).each(function (i, el) {
-            var isNeed = true;
-            if (
-              (_opt.limit && limited >= _opt.limit) ||
-              (_opt.skip && i <= _opt.skip)
-            ) {
-              isNeed = false;
-            }
-            if (isNeed) {
-              HTML += $(this).html();
-              HTML += '<hr style="margin: 20px 0;">';
-              limited++;
-            }
-          });
+          if (_opt.view == 'html') {
+            // _console.log(tag.class, tag.count, tag.parent, tag.parentCount, tag.diff + '%', tag.content);
+            HTML += getDataAsHTML(tag, _opt);
+          }
+          if (_opt.view == 'json') {
+            HTML.push(getDataAsJSON(tag, _opt));
+          }
         }
-        HTML += '</div>'
       }
     });
+
+    if (_opt.view == 'html') {
+      HTML = addHostToLink(HTML, _opt.host);
+    }
   }
-  // var childs = getAllChildrens($(getClass('item')).toArray()[0]);
-  // _console.log(childs);
-  _next(null, addHostToLink(HTML, _opt.host));
+  _next(null, HTML);
 };
 
 

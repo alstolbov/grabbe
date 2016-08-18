@@ -12,10 +12,13 @@ var port = 8080;
 // }));
 
 var parseHost = function (str) {
-  var res = getLocation(str);
-  if (!res) {
-    res = getLocation('http://' + str);
+  if (str.indexOf('http://') < 0 && str.indexOf('https://')) {
+    str = 'http://' + str;
   }
+  if (str.slice(-1) !== '') {
+    str = str + '/';
+  }
+  var res = getLocation(str);
 
   return res;
 }
@@ -51,7 +54,7 @@ app.get('/', function (_req, _res) {
       )
       .end(function (err, res) {
         if (err) {
-          _res.send('error connect to ' + req.query.parse);
+          _res.send('error connect to ' + _req.query.parse);
         } else {
           grabbe.parse(
             {
@@ -60,21 +63,27 @@ app.get('/', function (_req, _res) {
               diff: _req.query.diff || 50,
               limit: _req.query.limit || 0,
               skip: _req.query.skip || 0,
-              parent: _req.query.parent || false
+              parent: _req.query.parent || false,
+              view: _req.query.view || 'json'
             },
             function (err, text) {
-            _res.send(
-              '<!DOCTYPE html>\
-              <html>\
-                <head>\
-                  <meta charset=utf-8 />\
-                  <title>Parse ' + _req.query.parse + '</title>\
-                </head>\
-                <body>' +
-                text +
-                '</body>\
-              </html>'
-            );
+              if (_req.query.view == 'html') {
+                _res.send(
+                  '<!DOCTYPE html>\
+                  <html>\
+                    <head>\
+                      <meta charset=utf-8 />\
+                      <title>Parse ' + _req.query.parse + '</title>\
+                    </head>\
+                    <body>' +
+                    text +
+                    '</body>\
+                  </html>'
+                );
+              } else if (_req.query.view == 'json') {
+                console.log(text);
+                _res.json(text);
+              }
             }
           );
 
