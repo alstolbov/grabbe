@@ -26,7 +26,7 @@ var textRules = function (htmlPiece) {
 module.exports = function (src) {
   var res = [];
   var clearTextRes = [];
-  src.map(function (tag) {
+  src.data.map(function (tag) {
     var tmpItems = [];
     var clearTextTmpItems = [];
     tag.items.map(function (item) {
@@ -47,6 +47,6 @@ module.exports = function (src) {
       });
     }
   });
-  _console.log(clearTextRes);
+  // _console.log(clearTextRes);
   return res;
 };

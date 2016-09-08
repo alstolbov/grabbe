@@ -96,7 +96,10 @@ app.get('/', function (_req, _res) {
             function (err, text) {
               var resText = text
               if (_req.query.analyse == 'analyse') {
-                resText = textAnalyser(text);
+                resText = textAnalyser({
+                  data: text,
+                  noLinks: _req.query.noLinks || false
+                });
               }
               if (_req.query.view == 'html') {
                   _res.send(

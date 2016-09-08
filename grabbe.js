@@ -69,38 +69,38 @@ var addHostToLink = function (srcText, host) {
   return srcText.replace(reg, 'href="' + host);
 }
 
-var getDataAsHTML = function (tag, _opt) {
-  var limited = 0;
-  var HTML = '';
-  var tmpText = 'From: ' + tag.class +
-    '<br>count:' + tag.count +
-    '<br>parent:' + tag.parent +
-    '<br>parentCount:' + tag.parentCount +
-    '<br>diff:' + tag.diff + '%'
-  ;
-  HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
-    tmpText +
-    '</div>';
-
-  $(getClass(tag.class)).each(function (i, el) {
-    var isNeed = true;
-    if (
-      (_opt.limit && limited >= _opt.limit) ||
-      (_opt.skip && i <= _opt.skip)
-    ) {
-      isNeed = false;
-    }
-    if (isNeed) {
-      HTML += $(this).html();
-      HTML += '<hr style="margin: 20px 0;">';
-      limited++;
-    }
-  });
-
-  HTML += '</div>';
-
-  return HTML;
-}
+// var getDataAsHTML = function (tag, _opt) {
+//   var limited = 0;
+//   var HTML = '';
+//   var tmpText = 'From: ' + tag.class +
+//     '<br>count:' + tag.count +
+//     '<br>parent:' + tag.parent +
+//     '<br>parentCount:' + tag.parentCount +
+//     '<br>diff:' + tag.diff + '%'
+//   ;
+//   HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
+//     tmpText +
+//     '</div>';
+//
+//   $(getClass(tag.class)).each(function (i, el) {
+//     var isNeed = true;
+//     if (
+//       (_opt.limit && limited >= _opt.limit) ||
+//       (_opt.skip && i <= _opt.skip)
+//     ) {
+//       isNeed = false;
+//     }
+//     if (isNeed) {
+//       HTML += $(this).html();
+//       HTML += '<hr style="margin: 20px 0;">';
+//       limited++;
+//     }
+//   });
+//
+//   HTML += '</div>';
+//
+//   return HTML;
+// }
 
 var getDataAsJSON = function (tag, _opt) {
   var limited = 0;
