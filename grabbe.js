@@ -81,7 +81,7 @@ var getDataAsHTML = function (tag, _opt) {
   HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
     tmpText +
     '</div>';
-  
+
   $(getClass(tag.class)).each(function (i, el) {
     var isNeed = true;
     if (
@@ -109,16 +109,6 @@ var getDataAsJSON = function (tag, _opt) {
     items: []
   };
 
-  // var tmpText = 'From: ' + tag.class +
-  //   '<br>count:' + tag.count +
-  //   '<br>parent:' + tag.parent +
-  //   '<br>parentCount:' + tag.parentCount +
-  //   '<br>diff:' + tag.diff + '%'
-  // ;
-  // HTML += '<div style="margin: 20px; padding: 10px; border: 1px solid #ddd;"><div style="background: #ddd; font-weight: bold;">' +
-  //   tmpText +
-  //   '</div>';
-  
   $(getClass(tag.class)).each(function (i, el) {
     var isNeed = true;
     if (

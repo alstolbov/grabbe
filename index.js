@@ -3,6 +3,7 @@ var app = express();
 
 var request = require('superagent');
 var grabbe = require('./grabbe.js');
+var textAnalyser = require('./textAnalyser.js');
 var port = 8080;
 
 // var bodyParser = require("body-parser");
@@ -37,6 +38,31 @@ function getLocation(href) {
     };
 }
 
+function asHTML (src) {
+  var HTML = '';
+  src.text.map(function (tag) {
+    HTML += '<div>' + tag.parent + '</div><div>';
+    var limited = 0;
+    var isNeed = true;
+    tag.items.map(function (item, i) {
+      if (
+        (src.limit && limited >= src.limit) ||
+        (src.skip && i <= src.skip)
+      ) {
+        isNeed = false;
+      }
+      if (isNeed) {
+        HTML += item;
+        HTML += '<hr style="margin: 20px 0;">';
+        limited++;
+      }
+    });
+    HTML += '</div><br><br><br>';
+  });
+
+  return HTML;
+}
+
 app.get('/', function (_req, _res) {
   if (!_req.query.parse || _req.query.parse == "") {
     _res.sendFile(__dirname + '/help.html');
@@ -64,25 +90,33 @@ app.get('/', function (_req, _res) {
               limit: _req.query.limit || 0,
               skip: _req.query.skip || 0,
               parent: _req.query.parent || false,
-              view: _req.query.view || 'json'
+              // view: _req.query.view || 'json'
+              view: 'json'
             },
             function (err, text) {
+              var resText = text
+              if (_req.query.analyse == 'analyse') {
+                resText = textAnalyser(text);
+              }
               if (_req.query.view == 'html') {
-                _res.send(
-                  '<!DOCTYPE html>\
-                  <html>\
-                    <head>\
-                      <meta charset=utf-8 />\
-                      <title>Parse ' + _req.query.parse + '</title>\
-                    </head>\
-                    <body>' +
-                    text +
-                    '</body>\
-                  </html>'
-                );
+                  _res.send(
+                    '<!DOCTYPE html>\
+                    <html>\
+                      <head>\
+                        <meta charset=utf-8 />\
+                        <title>Parse ' + _req.query.parse + '</title>\
+                      </head>\
+                      <body>' +
+                      asHTML({
+                        text: resText,
+                        skip: _req.query.skip || 0,
+                        limit: _req.query.limit || 0
+                      }) +
+                      '</body>\
+                    </html>'
+                  );
               } else if (_req.query.view == 'json') {
-                console.log(text);
-                _res.json(text);
+                 _res.json(resText);
               }
             }
           );
