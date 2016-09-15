@@ -23,6 +23,39 @@ var textRules = function (htmlPiece) {
   return res ? clearText : res;
 };
 
+var delDoubleTextAsSimpleLink = function (srcItems, clearTextItems) {
+  var res = [];
+  clearTextItems.map(function(currTag, currTagIter) {
+    var tmpItems = [];
+    currTag.items.map(function (currItem, currItemIter) {
+      var isAdd = true;
+      clearTextItems.map(function (commonTag, commonTagIter) {
+        if (commonTagIter !== currTagIter) {
+          commonTag.items.map(function (commonItem) {
+            if (
+              (commonItem.indexOf(currItem) + 1) &&
+              commonItem.length > currItem.length
+            ) {
+              isAdd = false;
+            }
+          });
+        }
+      });
+      if (isAdd) {
+        tmpItems.push(srcItems[currTagIter].items[currItemIter]);
+      }
+    });
+    if (tmpItems.length) {
+      res.push({
+        parent: currTag.parent,
+        items: tmpItems
+      });
+    }
+  });
+
+  return res;
+};
+
 module.exports = function (src) {
   var res = [];
   var clearTextRes = [];
@@ -47,6 +80,7 @@ module.exports = function (src) {
       });
     }
   });
+  if (src.noLinks) res = delDoubleTextAsSimpleLink(res, clearTextRes);
   // _console.log(clearTextRes);
   return res;
 };
